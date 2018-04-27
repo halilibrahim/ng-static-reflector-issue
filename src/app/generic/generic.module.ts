@@ -1,40 +1,25 @@
-import { Component, Injector, ModuleWithProviders, NgModule, Type } from '@angular/core';
-import { ActivatedRouteSnapshot, Route, Routes, RouterModule } from '@angular/router';
+import { Component, Injector, ModuleWithProviders, NgModule, Type, InjectionToken, ANALYZE_FOR_ENTRY_COMPONENTS } from '@angular/core';
+import { ActivatedRouteSnapshot, Route, Routes, RouterModule, provideRoutes, ROUTES } from '@angular/router';
 
-import { AppGenericComponentParams, AppGenericModuleParameters } from './generic-module.parameters';
+import { AppGenericComponentParams, AppGenericModuleParameters, AppGenericModuleWithCustomList,
+    AppGenericModuleParamsWithoutCustomComponent } from './generic-module.parameters';
+import { AppGenericListComponent } from './generic-list.component';
+import { AppGenericFormComponent } from './generic-form.component';
 
-const genericModuleDefaults = {
-    declarations: [],
-    imports: [],
-    exports: []
-};
 
-@NgModule(genericModuleDefaults)
+@NgModule({
+    declarations: [
+        AppGenericListComponent,
+        AppGenericFormComponent
+    ],
+    exports: [
+        AppGenericListComponent,
+        AppGenericFormComponent
+    ]
+})
 export class AppGenericModule {
-    public static genericFormComponent(componentConfig: AppGenericComponentParams) {
-        return Component({
-            template: `
-                <h1>` + componentConfig.moduleTitle + ` form page</h1>
-                <a routerLink="/">Home</a>
-            `
-        })(class {});
-    }
-
-    public static genericListComponent(componentConfig: AppGenericComponentParams) {
-        return Component({
-            template: `
-                <h1>` + componentConfig.moduleTitle + ` list page</h1>
-                <ul>
-                    <li>Lorem <a routerLink="../edit/1">(edit)</a></li>
-                    <li>Ipsum <a routerLink="../edit/2">(edit)</a></li>
-                </ul>
-            `
-        })(class {});
-    }
-
-    public static genericRoutes(listComponent, formComponent, additionalRoutes: Route[] = []): Routes {
+    public static genericRoutes(listComponent, formComponent): Routes {
         return [
-            ...additionalRoutes,
             {
                 path: 'list',
                 component: listComponent
@@ -54,63 +39,79 @@ export class AppGenericModule {
         ];
     }
 
-    public static forChild(moduleConfig: AppGenericModuleParameters): ModuleWithProviders {
-        let listComponent: Type<any>;
-        let formComponent: Type<any>;
-
-        if (moduleConfig['listComponent'] && typeof moduleConfig['listComponent'] === 'function') {
-            listComponent = moduleConfig['listComponent'] as Type<any>;
-        } else {
-            listComponent = AppGenericModule.genericListComponent({
-                moduleTitle: moduleConfig['moduleTitle']
-            });
-        }
+    public static forChild(moduleConfig: AppGenericModuleParamsWithoutCustomComponent) {
+        // let listComponent: Type<any>;
+        // let formComponent: Type<any>;
+        // let l = moduleConfig;
+        // if ((moduleConfig as any).listComponent) {
+        //     const m = false;
+        // }
+        // if (moduleConfig['listComponent'] && typeof moduleConfig['listComponent'] === 'function') {
+        //     // listComponent = moduleConfig['listComponent'] as Type<any>;
+        // } else {
+        //     // listComponent = AppGenericListComponent;
+        // }
+        /*
         if (moduleConfig['formComponent'] && typeof moduleConfig['formComponent'] === 'function') {
             formComponent = moduleConfig['formComponent'] as Type<any>;
         } else {
-            formComponent = AppGenericModule.genericFormComponent({
-                moduleTitle: moduleConfig['moduleTitle']
-            });
+            formComponent = AppGenericFormComponent;
         }
-
-        if (!moduleConfig.additionalComponents) {
-            moduleConfig.additionalComponents = [];
-        }
-        if (!moduleConfig.routes) {
-            moduleConfig.routes = [];
-        }
-        if (moduleConfig.routes.length) {
-            moduleConfig.routes.forEach(route => {
-                moduleConfig.additionalComponents.push(route.component);
-            });
-        }
-        const ngModuleAnnotations: NgModule = {
-            declarations: [
-                formComponent,
-                listComponent
-            ],
-            imports: [
-                RouterModule.forChild(
-                    AppGenericModule.genericRoutes(
-                        listComponent,
-                        formComponent
-                    )
-                ),
-                AppGenericModule
-            ],
-            exports: [
-            ],
-            providers: [
-            ],
-            entryComponents: [
+        const routerModule = RouterModule.forChild(
+            AppGenericModule.genericRoutes(
                 listComponent,
-                formComponent,
-                moduleConfig.routes
-            ]
-        };
-
+                formComponent
+            )
+        );
+        const routes = [
+            {
+                path: 'list',
+                component: AppGenericListComponent
+            },
+            {
+                path: 'edit/:id',
+                component: AppGenericFormComponent
+            },
+            {
+                path: 'new',
+                component: AppGenericFormComponent
+            },
+            {
+                path: '**',
+                redirectTo: 'list'
+            }
+        ];
+        */
         return {
-            ngModule: NgModule(ngModuleAnnotations)(class { })
+            ngModule: AppGenericModule,
+            providers: [
+                provideRoutes([
+                    {
+                        path: 'list',
+                        component: AppGenericListComponent
+                    },
+                    {
+                        path: 'edit/:id',
+                        component: AppGenericFormComponent
+                    },
+                    {
+                        path: 'new',
+                        component: AppGenericFormComponent
+                    },
+                    {
+                        path: '**',
+                        redirectTo: 'list'
+                    }
+                ])
+            ]
+            // providers: [
+            //     {provide: ANALYZE_FOR_ENTRY_COMPONENTS, multi: true, useValue: routes},
+            //     {provide: ROUTES, multi: true, useValue: routes}
+            // ]
+            // providers: [
+            //     { provide: new InjectionToken('testInjection'), useValue: true}
+            // ]
+            // providers: routerModule.providers
         };
     }
 }

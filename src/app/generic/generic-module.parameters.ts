@@ -11,26 +11,24 @@ class AppGenericModuleCommonParams {
   config: any;
   translations?: any[];
   navigation?: any[];
-  routes?: Route[];
-  additionalComponents?: Type<any>[];
 }
 
-class AppGenericModuleWithCustomForm extends AppGenericModuleCommonParams {
+export class AppGenericModuleWithCustomForm extends AppGenericModuleCommonParams {
   moduleTitle: String;
   formComponent: Type<any>;
 }
 
-class AppGenericModuleWithCustomList extends AppGenericModuleCommonParams {
+export class AppGenericModuleWithCustomList extends AppGenericModuleCommonParams {
   moduleTitle: String;
   listComponent: Type<any>;
 }
 
-class AppGenericModuleParamsWithCustomListAndFormComponent extends AppGenericModuleCommonParams {
+export class AppGenericModuleParamsWithCustomListAndFormComponent extends AppGenericModuleCommonParams {
   formComponent: Type<any>;
   listComponent: Type<any>;
 }
 
-class AppGenericModuleParamsWithoutCustomComponent extends AppGenericModuleCommonParams {
+export class AppGenericModuleParamsWithoutCustomComponent extends AppGenericModuleCommonParams {
   moduleTitle: String;
 }
 
